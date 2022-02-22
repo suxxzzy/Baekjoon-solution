@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const input = fs.readFileSync('example.txt',"utf8").toString().split('\n'); //utf8이 없으니까 아무것도 출력 안되더라. 공식문서 보니 빈 버퍼만 나와서 나는 이렇게 해야했음. 
+const input = fs.readFileSync('example.txt',"utf8").toString().trim().split('\n'); //utf8이 없으니까 아무것도 출력 안되더라. 공식문서 보니 빈 버퍼만 나와서 나는 이렇게 해야했음. 
 
 console.log(input);
 
