@@ -1,84 +1,43 @@
-class GraphWithAdjacencyList {
-  constructor() {
-    this.vertices = {};
+function createMatrix(edges) {
+  //주어진 edges 배열의 각 요소의 0번 ,1번 인덱스 요소 중 최대값을 찾는다.
+  //그 최대값 +1 은 그래프의 가로 세로 길이가 된다.
+  //그래프를 만들었으면, edges를 순회하면서 간선을 추가한다.
+  //완성된 그래프를 리턴한다.
+  let max = 0;
+  for (let edge of edges) {
+    console.log(edge.slice(0, 2));
+    const [start, end] = edge.slice(0, 2);
+    const temp = Math.max(start, end);
+    max = Math.max(temp, max);
   }
+  console.log(max, "최대값");
 
-  addVertex(vertex) {
-    if (this.vertices[vertex]) return;
-    this.vertices[vertex] = [];
-  }
+  const graph = new Array(max + 1)
+    .fill(0)
+    .map((el) => new Array(max + 1).fill(0));
 
-  contains(vertex) {
-    return !!this.vertices[vertex];
-  }
+  console.log(graph, "그래프");
 
-  addEdge(fromVertex, toVertex) {
-    //우선 두 정점 모두 존재해야 한다. 안 그러면 kill
-    if (!this.contains(fromVertex) || !this.contains(toVertex)) return;
-    //간선이 있으면 안된다.
-    if (this.hasEdge(fromVertex, toVertex)) return;
-    //두 정점이 다 있으면 양측에 서로 추가한다.
-    this.vertices[fromVertex].push(toVertex);
-    this.vertices[toVertex].push(fromVertex);
-  }
-
-  //이렇게 구현하는 것보다, 한쪽만 확인해도 되도록 구현하는 것이 효율적.
-  hasEdge(fromVertex, toVertex) {
-    //두 정점 중 하나라도 없다면 false
-    if (!this.contains(fromVertex) || !this.contains(toVertex)) return false;
-    //두 정점 존재 하지만 배열에 서로가 없다면 false
-    //두 정점이 우선 존재하고, 그 정점의 배열에 서로가 있어야 한다.
-    return (
-      this.vertices[fromVertex].includes(toVertex) &&
-      this.vertices[toVertex].includes(fromVertex)
-    );
-  }
-
-  removeEdge(fromVertex, toVertex) {
-    //두 정점 모두 존재하지 않으면, 또는 간선 미존재시 거부
-    if (
-      !this.contains(fromVertex) ||
-      !this.contains(toVertex) ||
-      !this.hasEdge(fromVertex, toVertex)
-    )
-      return;
-    //위 경우 외에는 정점과 간선 모두 존재하기 때문에 삭제할 수 있다. (두 번 삭제가 필요하다)
-    this.vertices[fromVertex] = this.vertices[fromVertex].filter(
-      (el) => el !== toVertex
-    );
-    this.vertices[toVertex] = this.vertices[toVertex].filter(
-      (el) => el !== fromVertex
-    );
-  }
-
-  removeVertex(vertex) {
-    //정점이 존재하지 않는다면 삭제 거부
-    if (!this.contains(vertex)) return;
-    //모든 정점을 돌면서, 각 정점과 vertex간의 간선을 삭제한다
-    for (let v in this.vertices) {
-      this.removeEdge(v, vertex);
+  edges.forEach((edge) => {
+    const [start, end, dir] = edge;
+    if (dir === "directed") {
+      graph[start][end] = 1;
+    } else {
+      graph[start][end] = 1;
+      graph[end][start] = 1;
     }
-    //그런 다음 정점을 삭제한다
-    delete this.vertices[vertex];
-  }
+  });
+
+  return graph;
 }
 
-const adjList = new GraphWithAdjacencyList();
-adjList.addVertex("Seoul");
-adjList.addVertex("Daejeon");
-adjList.addVertex("Busan");
+const output1 = createMatrix([
+  [0, 3, "directed"],
+  [0, 2, "directed"],
+  [1, 3, "directed"],
+  [2, 1, "directed"],
+]);
 
-console.log(adjList);
+console.log(output1);
 
-console.log(adjList.contains("Seoul")); // true
-console.log(adjList.contains("Jeonju")); // false
-
-console.log(adjList.addEdge("Daejeon", "Seoul"));
-console.log(adjList);
-console.log(adjList.hasEdge("Seoul", "Daejeon")); //true
-
-console.log(adjList.removeVertex("Seoul"));
-console.log(adjList);
-console.log(adjList.hasEdge("Seoul", "Daejeon")); //false
-
-console.log(adjList);
+///console.log(new Array(3).fill(0).map((el) => new Array(3).fill(0)));
