@@ -1,43 +1,24 @@
-function createMatrix(edges) {
-  //주어진 edges 배열의 각 요소의 0번 ,1번 인덱스 요소 중 최대값을 찾는다.
-  //그 최대값 +1 은 그래프의 가로 세로 길이가 된다.
-  //그래프를 만들었으면, edges를 순회하면서 간선을 추가한다.
-  //완성된 그래프를 리턴한다.
-  let max = 0;
-  for (let edge of edges) {
-    console.log(edge.slice(0, 2));
-    const [start, end] = edge.slice(0, 2);
-    const temp = Math.max(start, end);
-    max = Math.max(temp, max);
+function getDirections(matrix, from, to) {
+  if (from < 0 || to < 0 || matrix.length <= from || matrix.length <= to)
+    return false;
+  const routes = [from];
+  const visited = {};
+  visited[from] = true;
+
+  function traversal(start) {
+    //출발 정점에서 갈 수 있는 모든 경로를 DFS로 탐색
+    matrix[start].forEach((el, idx) => {
+      if (el === 1 && !visited[idx]) {
+        visited[idx] = true;
+        routes.push(idx);
+        traversal(idx);
+      }
+    });
+    //단, 0인 지점이거나, 이미 방문한 지점은 방문하지 않는다.(방문 기록 남기기)
+    //그 경로를 배열에 담기
   }
-  console.log(max, "최대값");
 
-  const graph = new Array(max + 1)
-    .fill(0)
-    .map((el) => new Array(max + 1).fill(0));
-
-  console.log(graph, "그래프");
-
-  edges.forEach((edge) => {
-    const [start, end, dir] = edge;
-    if (dir === "directed") {
-      graph[start][end] = 1;
-    } else {
-      graph[start][end] = 1;
-      graph[end][start] = 1;
-    }
-  });
-
-  return graph;
+  traversal(from);
+  //경로에 to가 포함되어 있는지의 여부를 리턴한다.
+  return routes.includes(to);
 }
-
-const output1 = createMatrix([
-  [0, 3, "directed"],
-  [0, 2, "directed"],
-  [1, 3, "directed"],
-  [2, 1, "directed"],
-]);
-
-console.log(output1);
-
-///console.log(new Array(3).fill(0).map((el) => new Array(3).fill(0)));
