@@ -1,90 +1,84 @@
-class BST {
-  constructor(value) {
-    this.value = value;
-    this.left = null;
-    this.right = null;
+class GraphWithAdjacencyList {
+  constructor() {
+    this.vertices = {};
   }
 
-  insert(value) {
-    if (value === this.value) {
+  addVertex(vertex) {
+    if (this.vertices[vertex]) return;
+    this.vertices[vertex] = [];
+  }
+
+  contains(vertex) {
+    return !!this.vertices[vertex];
+  }
+
+  addEdge(fromVertex, toVertex) {
+    //우선 두 정점 모두 존재해야 한다. 안 그러면 kill
+    if (!this.contains(fromVertex) || !this.contains(toVertex)) return;
+    //간선이 있으면 안된다.
+    if (this.hasEdge(fromVertex, toVertex)) return;
+    //두 정점이 다 있으면 양측에 서로 추가한다.
+    this.vertices[fromVertex].push(toVertex);
+    this.vertices[toVertex].push(fromVertex);
+  }
+
+  //이렇게 구현하는 것보다, 한쪽만 확인해도 되도록 구현하는 것이 효율적.
+  hasEdge(fromVertex, toVertex) {
+    //두 정점 중 하나라도 없다면 false
+    if (!this.contains(fromVertex) || !this.contains(toVertex)) return false;
+    //두 정점 존재 하지만 배열에 서로가 없다면 false
+    //두 정점이 우선 존재하고, 그 정점의 배열에 서로가 있어야 한다.
+    return (
+      this.vertices[fromVertex].includes(toVertex) &&
+      this.vertices[toVertex].includes(fromVertex)
+    );
+  }
+
+  removeEdge(fromVertex, toVertex) {
+    //두 정점 모두 존재하지 않으면, 또는 간선 미존재시 거부
+    if (
+      !this.contains(fromVertex) ||
+      !this.contains(toVertex) ||
+      !this.hasEdge(fromVertex, toVertex)
+    )
       return;
-    } else if (value < this.value) {
-      if (this.left === null) {
-        this.left = new BST(value);
-      } else {
-        this.left.insert(value);
-      }
-    } else {
-      if (this.right === null) {
-        this.right = new BST(value);
-      } else {
-        this.right.insert(value);
-      }
-    }
+    //위 경우 외에는 정점과 간선 모두 존재하기 때문에 삭제할 수 있다. (두 번 삭제가 필요하다)
+    this.vertices[fromVertex] = this.vertices[fromVertex].filter(
+      (el) => el !== toVertex
+    );
+    this.vertices[toVertex] = this.vertices[toVertex].filter(
+      (el) => el !== fromVertex
+    );
   }
 
-  contains(value) {
-    //루트와 같으면 true
-    if (value === this.value) return true;
-    //루트 밑에 자식이 없으면 false
-    if (this.left === null && this.right === null) return false;
-    //루트보다 작으면 왼쪽으로
-    if (value < this.value) {
-      if (this.left !== null && value === this.left.value) return true; //* */
-      if (this.left === null) return false; //* */
-      return this.left.contains(value);
-      //왼쪽의 값과 같니? 같으면 true
-      //왼쪽 아래 자식이 하나도 없으면 false
-      //왼쪽의 값보다 작니? 왼쪽의 왼쪽값과 비교
-      //왼쪽의 값보다 크니? 왼쪽의 오른쪽값과 비교 ---- **부분 안 쓰면, null 값으로 인한 에러 발생한다
+  removeVertex(vertex) {
+    //정점이 존재하지 않는다면 삭제 거부
+    if (!this.contains(vertex)) return;
+    //모든 정점을 돌면서, 각 정점과 vertex간의 간선을 삭제한다
+    for (let v in this.vertices) {
+      this.removeEdge(v, vertex);
     }
-    if (value > this.value) {
-      if (this.right !== null && value === this.right.value) return true;
-      if (this.right === null) return false;
-      return this.right.contains(value);
-    }
-  }
-
-  preorder(callback) {
-    callback(this.value);
-    if (this.left !== null) {
-      this.left.preorder(callback);
-    }
-    if (this.right !== null) {
-      this.right.preorder(callback);
-    }
-  }
-
-  inorder(callback) {
-    if (this.left !== null) {
-      this.left.inorder(callback);
-    }
-    callback(this.value);
-    if (this.right !== null) {
-      this.right.inorder(callback);
-    }
-  }
-
-  postorder(callback) {
-    if (this.left !== null) {
-      this.left.postorder(callback);
-    }
-    if (this.right !== null) {
-      this.right.postorder(callback);
-    }
-    callback(this.value);
+    //그런 다음 정점을 삭제한다
+    delete this.vertices[vertex];
   }
 }
 
-const rootNode = new BST(10);
-rootNode.insert(7);
-rootNode.insert(8);
-rootNode.insert(12);
-rootNode.insert(11);
-rootNode.left.right.value; // 8
-rootNode.right.left.value; //11
+const adjList = new GraphWithAdjacencyList();
+adjList.addVertex("Seoul");
+adjList.addVertex("Daejeon");
+adjList.addVertex("Busan");
 
-let arr = [];
-rootNode.inorder((value) => arr.push(value * 2));
+console.log(adjList);
 
-console.log(arr);
+console.log(adjList.contains("Seoul")); // true
+console.log(adjList.contains("Jeonju")); // false
+
+console.log(adjList.addEdge("Daejeon", "Seoul"));
+console.log(adjList);
+console.log(adjList.hasEdge("Seoul", "Daejeon")); //true
+
+console.log(adjList.removeVertex("Seoul"));
+console.log(adjList);
+console.log(adjList.hasEdge("Seoul", "Daejeon")); //false
+
+console.log(adjList);
