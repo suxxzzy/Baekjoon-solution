@@ -1,20 +1,34 @@
-function factorial(n) {
-  if (n <= 1) return 1;
-  return n * factorial(n - 1);
+const cache = [];
+function fibonacci(n) {
+  //음수 입력 금지
+  if (n < 0) return;
+  //만약에  0, 1이면 그 숫자 그대로 반환
+  if (n <= 1) {
+    cache[n] = n;
+    return n;
+  }
+  //이미 캐시에 저장된 값이면
+  if (cache[n]) return cache[n];
+
+  //근데 그게 아니면
+  cache[n] = fibonacci(n - 2) + fibonacci(n - 1);
+  return cache[n];
 }
 
-function orderOfPresentation(N, K) {
-  //정답 변수 선언
-  let answer = 0;
-  //주어진 배열 K를 순회한다
-  for (let i = 0; i < K.length; i++) {
-    //각 자리 숫자보다 작은 숫자가 몇 개 있는지 구한다 ...(1)
-    //이전의 숫자 제외하고 남은 숫자 중 작은 숫자 개수를 알아낸다.
-    const smaller = K.slice(i + 1).filter((el) => el < K[i]).length;
-    //남아있는 자리수를 순서 구분하여 나열하는 가지수 구한다...(2)
-    const remain = factorial(K.slice(i + 1).length);
-    //1과 2를 곱한 값을 answer에 누적하며 더한다
-    answer += smaller * remain;
+//tabulation을 이용한 방법: 반복문이 사용됨
+
+function fib(n) {
+  if (n < 0) return;
+  const cache = [0, 1];
+  for (let i = 2; i <= n; i++) {
+    cache[i] = cache[i - 2] + cache[i - 1];
   }
-  return answer;
+  return cache[n];
 }
+console.log(fib(0));
+console.log(fib(1));
+console.log(fib(2));
+console.log(fib(3));
+console.log(fib(4));
+console.log(fib(5));
+console.log(fib(6));
