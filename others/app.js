@@ -1,22 +1,14 @@
-const isSubsetOf = function (base, sample) {
-  //예외처리
-  if (sample.length === 0) return true;
-  if (base.length < sample.length) return false;
-
-  //객체만들기
-  const object = {};
-  base.forEach((el) => {
-    if (!object[el]) object[el] = true;
-  });
-
-  let answer = false;
-  for (let i = 0; i < sample.length; i++) {
-    if (!object(sample[i])) {
-      return false;
-    } else {
-      answer = true;
+function bubbelsort(arr) {
+  //배열의 크기만큼 반복
+  for (let i = 0; i < arr.length; i++) {
+    let swap = 0;
+    for (let j = 0; j < arr.length - 1; j++) {
+      if (arr[j] > arr[j + 1]) {
+        [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+        swap++;
+      }
     }
+    if (swap === 0) break;
   }
-
-  return answer;
-};
+  return arr;
+}
