@@ -10,7 +10,12 @@ const nextEmptySpot = function (board) {
 
 //주어진 숫자를 가로줄에 넣을 수 있는지 확인하는 함수
 const checkRow = function (number, board, row) {
-  return !board[row].includes(number);
+  for (let r = 0; r < board.length; r++) {
+    if (board[row][r] === number) {
+      return false;
+    }
+  }
+  return true;
 };
 
 //주어진 숫자를 세로줄에 넣을 수 있는지 확인하는 함수
@@ -51,7 +56,7 @@ const isValid = function (number, board, row, col) {
 const sudoku = function (board) {
   //우선 빈칸을 찾는다.
   const es = nextEmptySpot(board);
-  console.log("빈칸 위치", es);
+
   //재귀 탈출 조건: 빈칸이 다 채워진 보드를 리턴한다
   if (es === -1) return board;
 
@@ -61,16 +66,16 @@ const sudoku = function (board) {
     //일단 해당 숫자가 빈칸에 들어갈 수 있는지를 검증해야 한다.
     if (isValid(n, board, row, col)) {
       board[row][col] = n;
-      console.log("빈칸 채운 보드", board);
-      if (sudoku(board) === null) continue;
-      return sudoku(board);
+      sudoku(board);
     }
   }
   //1부터 9까지 다 숫자를 하나씩 넣어보았는데도, 맞는 숫자가 하나도 없다면 이전에 숫자를 잘못 넣은 것이다.
   //이전에 넣었던 숫자를 0으로 되돌리기
-  console.log("1-9까지 다 넣었는데 안 맞음", board);
-  board[row][col] = 0;
-  return null; //?
+
+  if (nextEmptySpot(board) !== -1) {
+    board[row][col] = 0;
+  }
+  return board;
 };
 
 let board = [
