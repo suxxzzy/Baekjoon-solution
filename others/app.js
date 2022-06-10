@@ -32,8 +32,8 @@ const checkCol = function (number, board, col) {
 const checkBox = function (number, board, row, col) {
   const rr = row - (row % 3);
   const cr = col - (col % 3);
-  for (let r = rr; r <= rr + 3; r++) {
-    for (let c = cr; c <= cr + 3; c++) {
+  for (let r = rr; r <= rr + 2; r++) {
+    for (let c = cr; c <= cr + 2; c++) {
       if (board[r][c] === number) return false;
     }
   }
@@ -71,9 +71,11 @@ const sudoku = function (board) {
   }
   //1부터 9까지 다 숫자를 하나씩 넣어보았는데도, 맞는 숫자가 하나도 없다면 이전에 숫자를 잘못 넣은 것이다.
   //이전에 넣었던 숫자를 0으로 되돌리기
-
+  //다음지점***
   if (nextEmptySpot(board) !== -1) {
-    board[row][col] = 0;
+    console.log("전", board, row, col);
+    board[row][col] = 0; //현재지점***
+    console.log("후", board);
   }
   return board;
 };
@@ -90,4 +92,3 @@ let board = [
   [7, 0, 3, 0, 1, 8, 0, 0, 0],
 ];
 let output = sudoku(board);
-console.log(output);
