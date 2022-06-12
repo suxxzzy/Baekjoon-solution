@@ -1,94 +1,50 @@
-//9*9보드에서 다음 빈칸을 찾는 함수
-const nextEmptySpot = function (board) {
-  for (let row = 0; row < board.length; row++) {
-    for (let col = 0; col < board.length; col++) {
-      if (board[row][col] === 0) return [row, col];
+let dfs = function (node) {
+  //예외:
+  if (!node) return;
+  //그 외
+  const answer = [];
+  const traversal = function (start) {
+    //console.log(start, "노드");
+    answer.push(start.value);
+    //자식이 존재한다면
+    if (start.children.length) {
+      for (let i = 0; i < start.children.length; i++) {
+        //console.log(start.children[i], "노드자식");
+        traversal(start.children[i]);
+      }
     }
-  }
-  return -1;
+  };
+  traversal(node);
+  return answer;
 };
 
-//주어진 숫자를 가로줄에 넣을 수 있는지 확인하는 함수
-const checkRow = function (number, board, row) {
-  for (let r = 0; r < board.length; r++) {
-    if (board[row][r] === number) {
-      return false;
-    }
-  }
-  return true;
+// 이 아래 코드는 변경하지 않아도 됩니다. 자유롭게 참고하세요.
+//{value: xx, children: []}, addchild라는 메소드가 있다.(배열에 요소 추가하고 추가한 아이반환)
+let Node = function (value) {
+  this.value = value;
+  this.children = [];
 };
 
-//주어진 숫자를 세로줄에 넣을 수 있는지 확인하는 함수
-const checkCol = function (number, board, col) {
-  for (let r = 0; r < board.length; r++) {
-    if (board[r][col] === number) {
-      return false;
-    }
-  }
-  return true;
+// 위 Node 객체로 구성되는 트리는 매우 단순한 형태의 트리입니다.
+// membership check(중복 확인)를 따로 하지 않습니다.
+Node.prototype.addChild = function (child) {
+  this.children.push(child);
+  return child;
 };
+//제일 먼저 root의 value를 배열에 삽입
+//root의 자식이 존재한다면
+//자식 노드의 value를 넣는다.
+//이때 자식노드에도 자식노드가 존재한다면, 같은 과정을 반복한다.
+//더 이상 다른 자식이 존재하지 않을 떄까지 위 과정을 반복한다.
+let root = new Node(1);
+let rootChild1 = root.addChild(new Node(2));
+let rootChild2 = root.addChild(new Node(3));
+let leaf1 = rootChild1.addChild(new Node(4));
+let leaf2 = rootChild1.addChild(new Node(5));
+let output = dfs(root);
+console.log(output); // --> [1, 2, 4, 5, 3]
 
-//주어진 숫자를 3*3영역에 넣을 수 있는지 확인하는 함수
-const checkBox = function (number, board, row, col) {
-  const rr = row - (row % 3);
-  const cr = col - (col % 3);
-  for (let r = rr; r <= rr + 2; r++) {
-    for (let c = cr; c <= cr + 2; c++) {
-      if (board[r][c] === number) return false;
-    }
-  }
-  return true;
-};
-
-//주어진 숫자를 넣을 수 있는지 확인하는 함수
-const isValid = function (number, board, row, col) {
-  //가로줄에 넣을 수 있는가
-  //세로줄에 넣을 수 있는가
-  //3*3 영역에 넣을 수 있는가
-  return (
-    checkRow(number, board, row) &&
-    checkCol(number, board, col) &&
-    checkBox(number, board, row, col)
-  );
-};
-
-//메인 함수
-const sudoku = function (board) {
-  //우선 빈칸을 찾는다.
-  const es = nextEmptySpot(board);
-
-  //재귀 탈출 조건: 빈칸이 다 채워진 보드를 리턴한다
-  if (es === -1) return board;
-
-  //재귀 조건: 빈칸이 있는 한은 계속 숫자를 채우며 검증한다
-  const [row, col] = es;
-  for (let n = 1; n < 10; n++) {
-    //일단 해당 숫자가 빈칸에 들어갈 수 있는지를 검증해야 한다.
-    if (isValid(n, board, row, col)) {
-      board[row][col] = n;
-      sudoku(board);
-    }
-  }
-  //1부터 9까지 다 숫자를 하나씩 넣어보았는데도, 맞는 숫자가 하나도 없다면 이전에 숫자를 잘못 넣은 것이다.
-  //이전에 넣었던 숫자를 0으로 되돌리기
-  //다음지점***
-  if (nextEmptySpot(board) !== -1) {
-    console.log("전", board, row, col);
-    board[row][col] = 0; //현재지점***
-    console.log("후", board);
-  }
-  return board;
-};
-
-let board = [
-  [0, 3, 0, 2, 6, 0, 7, 0, 1],
-  [6, 8, 0, 0, 7, 0, 0, 9, 0],
-  [1, 9, 0, 0, 0, 4, 5, 0, 0],
-  [8, 2, 0, 1, 0, 0, 0, 4, 0],
-  [0, 0, 4, 6, 0, 2, 9, 0, 0],
-  [0, 5, 0, 0, 0, 3, 0, 2, 8],
-  [0, 0, 9, 3, 0, 0, 0, 7, 4],
-  [0, 4, 0, 0, 5, 0, 0, 3, 6],
-  [7, 0, 3, 0, 1, 8, 0, 0, 0],
-];
-let output = sudoku(board);
+leaf1.addChild(new Node(6));
+rootChild2.addChild(new Node(7));
+output = dfs(root);
+console.log(output); // --> [1, 2, 4, 6, 5, 3, 7]
