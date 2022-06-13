@@ -1,50 +1,34 @@
-let dfs = function (node) {
-  //예외:
-  if (!node) return;
-  //그 외
-  const answer = [];
-  const traversal = function (start) {
-    //console.log(start, "노드");
-    answer.push(start.value);
-    //자식이 존재한다면
-    if (start.children.length) {
-      for (let i = 0; i < start.children.length; i++) {
-        //console.log(start.children[i], "노드자식");
-        traversal(start.children[i]);
-      }
-    }
-  };
-  traversal(node);
-  return answer;
-};
+function largestProductOfThree(arr) {
+  //항상 배열의 길이가 3 이상인 경우만 생각한다.
+  //배열의 길이가 3인 경우는 손쉽게 바로 곱을 구하면 끝이다.
+  if (arr.length === 3) {
+    return arr.reduce((acc, cur) => acc * cur);
+  }
+  //배열의 길이가 3을 넘는 경우
+  //일단 오름차순으로 배열 정렬해보자.
+  arr.sort((a, b) => a - b);
+  const last = arr.length - 1;
 
-// 이 아래 코드는 변경하지 않아도 됩니다. 자유롭게 참고하세요.
-//{value: xx, children: []}, addchild라는 메소드가 있다.(배열에 요소 추가하고 추가한 아이반환)
-let Node = function (value) {
-  this.value = value;
-  this.children = [];
-};
+  //배열에서 가장 큰 수가 0인 경우: 0
+  if (arr[last] === 0) return 0;
 
-// 위 Node 객체로 구성되는 트리는 매우 단순한 형태의 트리입니다.
-// membership check(중복 확인)를 따로 하지 않습니다.
-Node.prototype.addChild = function (child) {
-  this.children.push(child);
-  return child;
-};
-//제일 먼저 root의 value를 배열에 삽입
-//root의 자식이 존재한다면
-//자식 노드의 value를 넣는다.
-//이때 자식노드에도 자식노드가 존재한다면, 같은 과정을 반복한다.
-//더 이상 다른 자식이 존재하지 않을 떄까지 위 과정을 반복한다.
-let root = new Node(1);
-let rootChild1 = root.addChild(new Node(2));
-let rootChild2 = root.addChild(new Node(3));
-let leaf1 = rootChild1.addChild(new Node(4));
-let leaf2 = rootChild1.addChild(new Node(5));
-let output = dfs(root);
-console.log(output); // --> [1, 2, 4, 5, 3]
-
-leaf1.addChild(new Node(6));
-rootChild2.addChild(new Node(7));
-output = dfs(root);
-console.log(output); // --> [1, 2, 4, 6, 5, 3, 7]
+  //배열이 모두 음수인 경우: 가장 마지막 요소가 0보다 작은 경우다. 제일 마지막 요소 3개를 곱한다.
+  //배열에서 가장 작은 수가 0 이상인 경우
+  //배열이 0, 양수 포함하는 경우
+  //배열이 양수만 포함하는 경우
+  if (arr[last] < 0 || arr[0] >= 0) {
+    return arr[last - 2] * arr[last - 1] * arr[last];
+  }
+  //배열이  음수, 0, 양수 모두 포함하는 경우
+  //음수 2개 이상
+  const minus = arr.filter((el) => el < 0);
+  if (minus.length >= 2) {
+    const cand1 = arr[last - 2] * arr[last - 1] * arr[last];
+    const cand2 = arr[0] * arr[1] * arr[last];
+    return Math.max(cand2, cand1);
+  }
+  //음수 1개
+  if (minus.length === 1) {
+    return arr[last - 2] * arr[last - 1] * arr[last];
+  }
+}
